@@ -6,7 +6,8 @@ import os
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+
+from model import model
 
 load_dotenv()
 path = os.getenv('DATASET_PATH')
@@ -33,19 +34,19 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 X_train = torch.FloatTensor(X_train)
 X_test = torch.FloatTensor(X_test)
 
-y_train = torch.CharTensor(y_train)
-y_test = torch.CharTensor(y_test)
+y_train = torch.LongTensor(y_train)
+y_test = torch.LongTensor(y_test)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
 
-epoches = 20
+epoches = 900
 
 for i in range(epoches):
     y_pred = model.forward(X_train)
     loss = criterion(y_pred, y_train) 
 
-    print(f'Epoch {i} | Loss: {loss}')
+    print(f'Epoch {i+1} | Loss: {loss}')
 
     optimizer.zero_grad()
     loss.backward()
