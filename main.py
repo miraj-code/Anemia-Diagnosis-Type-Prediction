@@ -29,7 +29,7 @@ for i in range(len(y)):
 X = X.values
 y = y.values
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=41)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=61)
 
 X_train = torch.FloatTensor(X_train)
 X_test = torch.FloatTensor(X_test)
@@ -38,9 +38,9 @@ y_train = torch.LongTensor(y_train)
 y_test = torch.LongTensor(y_test)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr = 0.01)
+optimizer = torch.optim.Adam(model.parameters())
 
-epoches = 900
+epoches = 4000
 
 for i in range(epoches):
     y_pred = model.forward(X_train)
