@@ -1,9 +1,9 @@
 # Import the necessary libraries for the program
 import pandas as pd
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from dotenv import load_dotenv
 import os
+from tqdm import tqdm
 
 import torch
 import torch.nn as nn
@@ -21,8 +21,7 @@ data = pd.read_csv(path)
 # The dictionary is in the format of {diagnosis: id} 
 diagnosis = sorted(list(set(data['Diagnosis'])))
 diagnosis_dict = {}
-for i in range(len(diagnosis)):
-    diagnosis_dict[diagnosis[i]] = i
+for i in range(len(diagnosis)): diagnosis_dict[diagnosis[i]] = i
 
 # Separate the input layers (are input features - X) and the output layers (y)
 X = data.drop('Diagnosis', axis = 1)
@@ -54,21 +53,25 @@ optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 # Set a value for the number of epoches
 epoches = 15000
 
+print(f'\nTraining Model \n'
+      f'--------------- \n')
 # Train the model iterating through the number of epoches
-for i in range(epoches):
+for i in tqdm(range(epoches)):
     # Forward the training dataset through the layers in the model
     y_pred = model.forward(X_train)
     # Calculate the loss
     loss = criterion(y_pred, y_train) 
-
-    print(f'Epoch {i+1} | Training Loss: {loss}')
 
     # Back propagate the loss to further train the model
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
 
+print(f'Completed! \n')
+
 # Evaluate the test data
+print(f'Evaluating Model...\n'
+      f'-------------------')
 with torch.no_grad():
     y_eval = model.forward(X_test)
     test_loss = criterion(y_eval, y_test)
@@ -79,21 +82,23 @@ with torch.no_grad():
     for i, data in enumerate(X_test):
         y_val = model.forward(data)
 
-        # print(f'{i + 1}  {str(y_val)} \t {y_test[i]} \t {y_val.argmax().item()}')
-
         if y_val.argmax().item() == y_test[i]:
             correct += 1
 
-print(f'\n ----------------------------------------------------------------------------------------------------- \n' 
-      f' Total Correct Diagnosis: {correct} | Training Loss: {loss} | Testing Loss: {test_loss} \n'
+print(f'Evaluation Completed! \n'
+      f'\n ----------------------------------------------------------------------------------------------------- \n' 
+      f' Total Correct Diagnosis: {correct}/{len((X_test))} | Training Loss: {loss} | Testing Loss: {test_loss} \n'
       f' ----------------------------------------------------------------------------------------------------- \n')
 
 # Detect the type of anemia with a new unseen data
 new_diagnosis = torch.tensor([5.3, 25.845, 77.511, 1.88076, 5.14094, 4.8, 15.1, 46.1526, 82, 31.4, 38.3, 70, 14.31251157, 0.26028])
-
+print(f'Diagnosing...\n'
+      f'-------------')
 with torch.no_grad():
-    print(model(new_diagnosis))
+    diagnosed_anemia = model(new_diagnosis)
+    result = [diagnosis_type for diagnosis_type, id in diagnosis_dict.items() if id == diagnosed_anemia.argmax().item()]
 
-print(diagnosis_dict)
+    print(f'Diagnosis Completed! The diagnosed anemia type is {result}.')
+
 
 
