@@ -68,16 +68,18 @@ for i in range(epoches):
     loss.backward()
     optimizer.step()
 
+# Evaluate the test data
 with torch.no_grad():
     y_eval = model.forward(X_test)
     test_loss = criterion(y_eval, y_test)
 
+# Display the necessary informations, like total correct diagnosis, training loss and testing loss 
 correct = 0
 with torch.no_grad():
     for i, data in enumerate(X_test):
         y_val = model.forward(data)
 
-        print(f'{i + 1}  {str(y_val)} \t {y_test[i]} \t {y_val.argmax().item()}')
+        # print(f'{i + 1}  {str(y_val)} \t {y_test[i]} \t {y_val.argmax().item()}')
 
         if y_val.argmax().item() == y_test[i]:
             correct += 1
@@ -85,5 +87,13 @@ with torch.no_grad():
 print(f'\n ----------------------------------------------------------------------------------------------------- \n' 
       f' Total Correct Diagnosis: {correct} | Training Loss: {loss} | Testing Loss: {test_loss} \n'
       f' ----------------------------------------------------------------------------------------------------- \n')
+
+# Detect the type of anemia with a new unseen data
+new_diagnosis = torch.tensor([5.3, 25.845, 77.511, 1.88076, 5.14094, 4.8, 15.1, 46.1526, 82, 31.4, 38.3, 70, 14.31251157, 0.26028])
+
+with torch.no_grad():
+    print(model(new_diagnosis))
+
+print(diagnosis_dict)
 
 
