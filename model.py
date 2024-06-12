@@ -7,7 +7,7 @@ import torch.nn.functional as F
 class Model(nn.Module):
     # Initialize the layers of the model. The model has 1 input layer (with 14 neurons), 
     # 3 hidden layers (each with 15 neurons), and 1 output layer (with 9 neurons)
-    def __init__(self, in_features = 14, h1 = 15, h2 = 15, h3 = 15, out_features = 9):
+    def __init__(self, in_features = 14, h1 = 25, h2 = 25, h3 = 25, out_features = 9):
         super().__init__()
         # Create 5 fully connected layers
         self.fc1 = nn.Linear(in_features, h1)
@@ -25,7 +25,7 @@ class Model(nn.Module):
         return x
 
 # Create a manual seed for randomization
-torch.manual_seed(61)
+torch.random.seed()
 
 # Initialize the model
 model = Model()

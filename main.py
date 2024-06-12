@@ -39,7 +39,7 @@ X = X.values
 y = y.values
 
 # Split X and y to train and test datasets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=61)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=40)
 
 # Convert the X and y arrays to Tensor for the model to process them correctly
 X_train = torch.FloatTensor(X_train)
@@ -49,10 +49,10 @@ y_test = torch.LongTensor(y_test)
 
 # Set the Loss function and Optimizer function
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters())
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
 # Set a value for the number of epoches
-epoches = 4000
+epoches = 15000
 
 # Train the model iterating through the number of epoches
 for i in range(epoches):
@@ -61,9 +61,29 @@ for i in range(epoches):
     # Calculate the loss
     loss = criterion(y_pred, y_train) 
 
-    print(f'Epoch {i+1} | Loss: {loss}')
+    print(f'Epoch {i+1} | Training Loss: {loss}')
 
     # Back propagate the loss to further train the model
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
+
+with torch.no_grad():
+    y_eval = model.forward(X_test)
+    test_loss = criterion(y_eval, y_test)
+
+correct = 0
+with torch.no_grad():
+    for i, data in enumerate(X_test):
+        y_val = model.forward(data)
+
+        print(f'{i + 1}  {str(y_val)} \t {y_test[i]} \t {y_val.argmax().item()}')
+
+        if y_val.argmax().item() == y_test[i]:
+            correct += 1
+
+print(f'\n ----------------------------------------------------------------------------------------------------- \n' 
+      f' Total Correct Diagnosis: {correct} | Training Loss: {loss} | Testing Loss: {test_loss} \n'
+      f' ----------------------------------------------------------------------------------------------------- \n')
+
+
